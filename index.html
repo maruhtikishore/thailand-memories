@@ -79,6 +79,16 @@
   #lb .cap b { color: var(--ink); }
   #progress { height: 3px; background: var(--gold); width: 0; transition: width linear; }
 
+  .vgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .vcard { position: relative; border-radius: 12px; overflow: hidden; background: var(--panel); cursor: pointer; aspect-ratio: 9/14; }
+  .vcard img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+  .vcard:hover img { transform: scale(1.06); }
+  .vcard .play { position: absolute; inset: 0; display: grid; place-items: center; font-size: 44px; color: #fff; text-shadow: 0 2px 14px #000; background: linear-gradient(transparent 55%, #000a); }
+  .vcard .meta { position: absolute; left: 10px; bottom: 8px; font-size: 12px; color: #fff; }
+  #vm { position: fixed; inset: 0; z-index: 110; background: #05070bf5; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+  #vm.open { display: flex; }
+  #vm video { max-width: 96vw; max-height: calc(100vh - 90px); border-radius: 10px; background: #000; }
+  .vbar { width: min(96vw, 900px); display: flex; justify-content: space-between; align-items: center; gap: 10px; color: var(--muted); flex-wrap: wrap; }
   footer { text-align: center; color: var(--muted); padding: 40px 0 60px; font-size: 14px; }
   @media (max-width: 600px) { #lb .stage { padding: 6px 6px; } #lb .nav { display: none; } .grid { columns: 2 140px; } }
 </style>
@@ -121,7 +131,13 @@
   </div>
 </div>
 
+<div id="vm" role="dialog" aria-modal="true">
+  <video id="vid" controls playsinline></video>
+  <div class="vbar"><span id="vcap"></span><span><button id="vprev">❮ Prev</button> <button id="vnext">Next ❯</button> <button id="vclose">✕ Close</button></span></div>
+</div>
+
 <script src="photos/photos.js"></script>
+<script src="videos/videos.js" onerror="window.VIDEOS=window.VIDEOS||[]"></script>
 <script>
 (() => {
   const photos = (window.PHOTOS || []).map((p, i) => ({ ...p, i, date: p.t.slice(0, 10) }));
@@ -148,14 +164,26 @@
   const sample = [...photos].sort(() => Math.random() - .5).slice(0, 12);
   $('#heroBg').innerHTML = sample.map(p => `<div style="background-image:url('${thumb(p)}')"></div>`).join('');
   $('#stats').innerHTML = [
-    [photos.length, 'Photos'], [days.filter(d => d !== 'bonus').length, 'Days'], [favs.size, 'Favourites']
-  ].map(([n, l], i) => `<div class="stat"><b ${i === 2 ? 'id="favCount"' : ''}>${n}</b><span>${l}</span></div>`).join('');
+    [photos.length, 'Photos'], [(window.VIDEOS || []).length, 'Videos'], [days.filter(d => d !== 'bonus').length, 'Days'], [favs.size, 'Favourites']
+  ].map(([n, l], i) => `<div class="stat"><b ${l === 'Favourites' ? 'id="favCount"' : ''}>${n}</b><span>${l}</span></div>`).join('');
 
   // ---- view state ----
-  let filter = 'all';          // 'all' | 'favs' | date
+  let filter = 'all';          // 'all' | 'favs' | 'videos' | date
   let visible = photos;        // list used by the lightbox
+  const videos = window.VIDEOS || [];
+  const clip = v => `videos/clips/${encodeURIComponent(v.id)}.mp4`;
+  const poster = v => `videos/poster/${encodeURIComponent(v.id)}.jpg`;
+
+  function renderVideos() {
+    if (!videos.length) { main.innerHTML = '<div class="empty">No videos added yet.</div>'; return; }
+    main.innerHTML = `<section class="day"><div class="day-head"><span class="n">🎬 Videos</span><span class="c">${videos.length} clips</span></div>
+      <div class="vgrid">${videos.map((v, k) => `
+        <div class="vcard" data-k="${k}"><img loading="lazy" src="${poster(v)}" alt="Video"><div class="play">▶</div>
+        <div class="meta">${new Date(v.t).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} · ${Math.round(v.dur)}s</div></div>`).join('')}</div></section>`;
+  }
 
   function render() {
+    if (filter === 'videos') return renderVideos();
     const list = filter === 'favs' ? photos.filter(p => favs.has(p.id))
                : filter === 'all' ? photos : photos.filter(p => p.date === filter);
     list.sort((a, b) => a.date === b.date ? a.t.localeCompare(b.t) : a.date.localeCompare(b.date));
@@ -178,6 +206,7 @@
   function buildNav() {
     dayNav.innerHTML =
       `<button data-f="all" class="active">All</button><button data-f="favs">♥ Favourites</button>` +
+      (videos.length ? `<button data-f="videos">🎬 Videos</button>` : '') +
       days.map(d => `<button data-f="${d}">${dayLabel(d)}</button>`).join('');
   }
   dayNav.addEventListener('click', e => {
@@ -188,7 +217,26 @@
     scrollTo({ top: main.offsetTop - 60 });
   });
 
+  // ---- video player ----
+  const vm = $('#vm'), vid = $('#vid');
+  let vk = 0;
+  function playVideo(k) {
+    vk = (k + videos.length) % videos.length;
+    const v = videos[vk];
+    vid.src = clip(v); vid.poster = poster(v);
+    $('#vcap').textContent = `${new Date(v.t).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })} · ${vk + 1} / ${videos.length}`;
+    vm.classList.add('open'); document.body.style.overflow = 'hidden';
+    vid.play().catch(() => {});
+  }
+  function closeVideo() { vid.pause(); vid.removeAttribute('src'); vid.load(); vm.classList.remove('open'); document.body.style.overflow = ''; }
+  $('#vclose').onclick = closeVideo;
+  $('#vprev').onclick = () => playVideo(vk - 1);
+  $('#vnext').onclick = () => playVideo(vk + 1);
+  vid.addEventListener('ended', () => playVideo(vk + 1));
+  addEventListener('keydown', e => { if (vm.classList.contains('open')) { if (e.key === 'Escape') closeVideo(); if (e.key === 'ArrowRight') playVideo(vk + 1); if (e.key === 'ArrowLeft') playVideo(vk - 1); } });
+
   main.addEventListener('click', e => {
+    const vc = e.target.closest('.vcard'); if (vc) return playVideo(+vc.dataset.k);
     const card = e.target.closest('.card'); if (!card) return;
     if (e.target.closest('.heart')) { toggleFav(card.dataset.id); card.classList.toggle('fav', favs.has(card.dataset.id)); return; }
     openLb(+card.dataset.v);
