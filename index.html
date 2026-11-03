@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thailand 2026 · OG Boys Memories</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161c26; --ink: #f3ece0; --muted: #9aa4b2;
+    --gold: #f4b942; --coral: #ff6b5b; --teal: #2ec4b6;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif; }
+
+  /* ---------- hero ---------- */
+  header.hero {
+    position: relative; min-height: 78vh; display: grid; place-items: center; text-align: center;
+    padding: 40px 20px; overflow: hidden;
+    background: radial-gradient(ellipse at 20% 10%, #ff6b5b44, transparent 55%),
+                radial-gradient(ellipse at 85% 80%, #2ec4b655, transparent 55%), #0d1117;
+  }
+  .hero-bg { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(6, 1fr); opacity: .28; filter: saturate(1.2); }
+  .hero-bg div { background-size: cover; background-position: center; animation: drift 26s ease-in-out infinite alternate; }
+  .hero-bg div:nth-child(even) { animation-delay: -9s; animation-direction: alternate-reverse; }
+  @keyframes drift { from { transform: scale(1.05) translateY(-2%); } to { transform: scale(1.2) translateY(2%); } }
+  .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 40%, var(--bg)); }
+  .hero-inner { position: relative; z-index: 2; max-width: 800px; }
+  .eyebrow { letter-spacing: .4em; text-transform: uppercase; color: var(--gold); font-size: 13px; }
+  h1 { font-size: clamp(48px, 10vw, 112px); line-height: 1; margin: 14px 0; font-weight: 800;
+       background: linear-gradient(100deg, var(--gold), var(--coral) 55%, var(--teal)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { color: #d6cfc2; font-size: 18px; }
+  .stats { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin: 30px 0; }
+  .stat { background: #ffffff10; border: 1px solid #ffffff22; backdrop-filter: blur(8px); border-radius: 16px; padding: 14px 24px; min-width: 120px; }
+  .stat b { display: block; font-size: 30px; color: var(--gold); }
+  .stat span { font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  .cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  button, .btn {
+    font: inherit; cursor: pointer; border: 0; border-radius: 999px; padding: 12px 22px; color: var(--ink);
+    background: #ffffff14; border: 1px solid #ffffff2a; transition: .2s;
+  }
+  button:hover { background: #ffffff26; transform: translateY(-1px); }
+  button.primary { background: linear-gradient(100deg, var(--coral), var(--gold)); color: #1a1208; font-weight: 700; border: 0; }
+  button.active { background: var(--gold); color: #1a1208; border-color: var(--gold); }
+
+  /* ---------- sticky day bar ---------- */
+  nav.days { position: sticky; top: 0; z-index: 20; background: #0d1117e6; backdrop-filter: blur(10px);
+             border-bottom: 1px solid #ffffff14; padding: 10px 16px; display: flex; gap: 8px; overflow-x: auto; align-items: center; scrollbar-width: thin; }
+  nav.days button { padding: 8px 16px; font-size: 14px; white-space: nowrap; flex: none; }
+
+  /* ---------- gallery ---------- */
+  main { max-width: 1500px; margin: 0 auto; padding: 10px 16px 80px; }
+  section.day { margin-top: 46px; scroll-margin-top: 70px; }
+  .day-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .day-head .n { font-size: 42px; font-weight: 800; color: var(--gold); }
+  .day-head .d { font-size: 22px; }
+  .day-head .c { color: var(--muted); font-size: 14px; }
+  .grid { columns: 4 240px; column-gap: 10px; }
+  .card { position: relative; break-inside: avoid; margin: 0 0 10px; border-radius: 10px; overflow: hidden; background: var(--panel);
+          cursor: zoom-in; content-visibility: auto; contain-intrinsic-size: 240px 300px; }
+  .card img { display: block; width: 100%; height: auto; transition: transform .5s, filter .3s; }
+  .card:hover img { transform: scale(1.05); filter: brightness(1.1); }
+  .card .heart { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; padding: 0; border-radius: 50%;
+                 background: #00000066; opacity: 0; font-size: 18px; line-height: 1; }
+  .card:hover .heart, .card.fav .heart { opacity: 1; }
+  .card.fav .heart { background: var(--coral); }
+  .empty { text-align: center; color: var(--muted); padding: 80px 0; }
+
+  /* ---------- lightbox ---------- */
+  #lb { position: fixed; inset: 0; z-index: 100; background: #05070bf2; display: none; flex-direction: column; }
+  #lb.open { display: flex; }
+  #lb .stage { flex: 1; display: grid; place-items: center; min-height: 0; padding: 10px 60px; position: relative; }
+  #lb .stage { overflow: hidden; }
+  #lb img { max-width: 100%; max-height: calc(100vh - 110px); width: auto; height: auto; object-fit: contain; border-radius: 8px; box-shadow: 0 20px 80px #000; }
+  #lb .bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; color: var(--muted); gap: 10px; flex-wrap: wrap; }
+  #lb .bar .btns { display: flex; gap: 8px; }
+  #lb .nav { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; padding: 0; font-size: 22px; border-radius: 50%; }
+  #lb .prev { left: 8px; } #lb .next { right: 8px; }
+  #lb .cap b { color: var(--ink); }
+  #progress { height: 3px; background: var(--gold); width: 0; transition: width linear; }
+
+  footer { text-align: center; color: var(--muted); padding: 40px 0 60px; font-size: 14px; }
+  @media (max-width: 600px) { #lb .stage { padding: 6px 6px; } #lb .nav { display: none; } .grid { columns: 2 140px; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-inner">
+    <div class="eyebrow">OG Boys · Memory Diary</div>
+    <h1>Thailand 2026</h1>
+    <p class="sub">Every moment, every laugh, every photo — all in one place.</p>
+    <div class="stats" id="stats"></div>
+    <div class="cta">
+      <button class="primary" id="playAll">▶ Play slideshow</button>
+      <button id="shuffle">🎲 Random memory</button>
+      <button id="jump">⬇ Start scrolling</button>
+    </div>
+  </div>
+</header>
+
+<nav class="days" id="dayNav"></nav>
+<main id="main"></main>
+<footer>Made with ❤ for the OG Boys · Thailand 2026</footer>
+
+<div id="lb" role="dialog" aria-modal="true">
+  <div id="progress"></div>
+  <div class="stage">
+    <button class="nav prev" id="prev" aria-label="Previous">❮</button>
+    <img id="lbImg" alt="">
+    <button class="nav next" id="next" aria-label="Next">❯</button>
+  </div>
+  <div class="bar">
+    <div class="cap" id="cap"></div>
+    <div class="btns">
+      <button id="lbFav">♡ Favourite</button>
+      <button id="lbPlay">▶ Play</button>
+      <button id="lbClose">✕ Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="photos/photos.js"></script>
+<script>
+(() => {
+  const photos = (window.PHOTOS || []).map((p, i) => ({ ...p, i, date: p.t.slice(0, 10) }));
+  // Real trip days = dates with plenty of photos; stray photos (other dates) go to "Bonus memories".
+  const counts = {};
+  photos.forEach(p => counts[p.date] = (counts[p.date] || 0) + 1);
+  photos.forEach(p => { if (counts[p.date] < 20) p.date = 'bonus'; });
+  const $ = s => document.querySelector(s);
+  const main = $('#main'), dayNav = $('#dayNav');
+  let favs = new Set();
+  try { favs = new Set(JSON.parse(localStorage.getItem('thai-favs') || '[]')); } catch {}
+  const saveFavs = () => { try { localStorage.setItem('thai-favs', JSON.stringify([...favs])); } catch {} };
+
+  // ---- group by day ----
+  const byDay = new Map();
+  photos.forEach(p => { if (!byDay.has(p.date)) byDay.set(p.date, []); byDay.get(p.date).push(p); });
+  const days = [...byDay.keys()].sort();
+  const fmt = d => d === 'bonus' ? 'Extra moments from other dates' : new Date(d + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+  const dayLabel = d => d === 'bonus' ? 'Bonus' : 'Day ' + (days.indexOf(d) + 1);
+  const thumb = p => `photos/thumb/${encodeURIComponent(p.id)}.webp`;
+  const full  = p => `photos/full/${encodeURIComponent(p.id)}.webp`;
+
+  // ---- hero ----
+  const sample = [...photos].sort(() => Math.random() - .5).slice(0, 12);
+  $('#heroBg').innerHTML = sample.map(p => `<div style="background-image:url('${thumb(p)}')"></div>`).join('');
+  $('#stats').innerHTML = [
+    [photos.length, 'Photos'], [days.filter(d => d !== 'bonus').length, 'Days'], [favs.size, 'Favourites']
+  ].map(([n, l], i) => `<div class="stat"><b ${i === 2 ? 'id="favCount"' : ''}>${n}</b><span>${l}</span></div>`).join('');
+
+  // ---- view state ----
+  let filter = 'all';          // 'all' | 'favs' | date
+  let visible = photos;        // list used by the lightbox
+
+  function render() {
+    const list = filter === 'favs' ? photos.filter(p => favs.has(p.id))
+               : filter === 'all' ? photos : photos.filter(p => p.date === filter);
+    list.sort((a, b) => a.date === b.date ? a.t.localeCompare(b.t) : a.date.localeCompare(b.date));
+    visible = list;
+    const groups = new Map();
+    list.forEach(p => { if (!groups.has(p.date)) groups.set(p.date, []); groups.get(p.date).push(p); });
+    if (!list.length) { main.innerHTML = '<div class="empty">No photos here yet — tap the ♡ on a photo to add favourites.</div>'; return; }
+    let idx = 0;
+    main.innerHTML = [...groups.entries()].map(([d, arr]) => {
+      return `<section class="day" id="day-${d}">
+        <div class="day-head"><span class="n">${dayLabel(d)}</span><span class="d">${fmt(d)}</span><span class="c">${arr.length} photos</span></div>
+        <div class="grid">${arr.map(p => `
+          <figure class="card${favs.has(p.id) ? ' fav' : ''}" data-v="${idx++}" data-id="${p.id}" style="aspect-ratio:${p.w}/${p.h}">
+            <img loading="lazy" decoding="async" src="${thumb(p)}" alt="Thailand memory" width="${p.w}" height="${p.h}">
+            <button class="heart" aria-label="Favourite">♥</button>
+          </figure>`).join('')}</div></section>`;
+    }).join('');
+  }
+
+  function buildNav() {
+    dayNav.innerHTML =
+      `<button data-f="all" class="active">All</button><button data-f="favs">♥ Favourites</button>` +
+      days.map(d => `<button data-f="${d}">${dayLabel(d)}</button>`).join('');
+  }
+  dayNav.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    filter = b.dataset.f;
+    dayNav.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+    render();
+    scrollTo({ top: main.offsetTop - 60 });
+  });
+
+  main.addEventListener('click', e => {
+    const card = e.target.closest('.card'); if (!card) return;
+    if (e.target.closest('.heart')) { toggleFav(card.dataset.id); card.classList.toggle('fav', favs.has(card.dataset.id)); return; }
+    openLb(+card.dataset.v);
+  });
+
+  function toggleFav(id) {
+    favs.has(id) ? favs.delete(id) : favs.add(id);
+    saveFavs();
+    const c = $('#favCount'); if (c) c.textContent = favs.size;
+    syncLbFav();
+  }
+
+  // ---- lightbox ----
+  const lb = $('#lb'), lbImg = $('#lbImg'), cap = $('#cap'), prog = $('#progress');
+  let cur = 0, timer = null;
+  function show(n) {
+    cur = (n + visible.length) % visible.length;
+    const p = visible[cur];
+    lbImg.src = full(p);
+    const t = new Date(p.t);
+    cap.innerHTML = `<b>${dayLabel(p.date)}</b> · ${p.date === 'bonus' ? t.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : fmt(p.date)} · ${t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} &nbsp;(${cur + 1} / ${visible.length})`;
+    syncLbFav();
+    [1, 2].forEach(k => { const q = visible[(cur + k) % visible.length]; if (q) new Image().src = full(q); });
+    if (timer) { prog.style.transition = 'none'; prog.style.width = '0'; requestAnimationFrame(() => { prog.style.transition = 'width 3.5s linear'; prog.style.width = '100%'; }); }
+  }
+  function syncLbFav() { if (!visible[cur]) return; const f = favs.has(visible[cur].id); $('#lbFav').textContent = (f ? '♥ Favourited' : '♡ Favourite'); $('#lbFav').classList.toggle('active', f); }
+  function openLb(n) { lb.classList.add('open'); document.body.style.overflow = 'hidden'; show(n); }
+  function closeLb() { stop(); lb.classList.remove('open'); document.body.style.overflow = ''; lbImg.removeAttribute('src'); }
+  function play() { stop(); $('#lbPlay').textContent = '⏸ Pause'; timer = setInterval(() => show(cur + 1), 3500); show(cur); }
+  function stop() { if (timer) clearInterval(timer); timer = null; $('#lbPlay').textContent = '▶ Play'; prog.style.transition = 'none'; prog.style.width = '0'; }
+
+  $('#prev').onclick = () => { stop(); show(cur - 1); };
+  $('#next').onclick = () => { stop(); show(cur + 1); };
+  $('#lbClose').onclick = closeLb;
+  $('#lbPlay').onclick = () => timer ? stop() : play();
+  $('#lbFav').onclick = () => { const p = visible[cur]; toggleFav(p.id); const c = document.querySelector(`.card[data-id="${CSS.escape(p.id)}"]`); if (c) c.classList.toggle('fav', favs.has(p.id)); };
+  lb.addEventListener('click', e => { if (e.target.classList.contains('stage')) closeLb(); });
+  addEventListener('keydown', e => {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLb();
+    if (e.key === 'ArrowRight') { stop(); show(cur + 1); }
+    if (e.key === 'ArrowLeft') { stop(); show(cur - 1); }
+    if (e.key === ' ') { e.preventDefault(); timer ? stop() : play(); }
+  });
+  let sx = 0;
+  lb.addEventListener('touchstart', e => sx = e.touches[0].clientX, { passive: true });
+  lb.addEventListener('touchend', e => { const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) { stop(); show(cur + (dx < 0 ? 1 : -1)); } });
+
+  // ---- hero buttons ----
+  $('#playAll').onclick = () => { visible = photos; openLb(0); play(); };
+  $('#shuffle').onclick = () => { visible = photos; openLb(Math.floor(Math.random() * photos.length)); };
+  $('#jump').onclick = () => scrollTo({ top: dayNav.offsetTop });
+
+  buildNav();
+  render();
+})();
+</script>
+</body>
+</html>
